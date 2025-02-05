@@ -77,7 +77,7 @@ resource "aws_autoscaling_group" "nat_instance" {
 
   launch_template {
     id      = aws_launch_template.nat_instance_template[each.key].id
-    version = "$Latest"
+    version = aws_launch_template.nat_instance_template[each.key].latest_version
   }
 
   dynamic "initial_lifecycle_hook" {
@@ -224,7 +224,7 @@ resource "aws_launch_template" "nat_instance_template" {
   image_id = var.nat_ami == "" ? data.aws_ami.amazon_linux_2.id : var.nat_ami
 
   instance_type = var.nat_instance_type
-  key_name = try(var.key_name, null)
+  key_name      = try(var.key_name, null)
   metadata_options {
     http_endpoint               = "enabled"
     http_tokens                 = "required"
@@ -273,12 +273,12 @@ resource "aws_security_group_rule" "nat_instance_egress" {
 resource "aws_security_group_rule" "nat_instance_ingress" {
   count = length(local.nat_instance_ingress_sgs)
 
-  type                     = "ingress"
-  protocol                 = "-1"
-  from_port                = 0
-  to_port                  = 0
-  cidr_blocks              = var.nat_allowed_cidrs
-  security_group_id        = aws_security_group.nat_instance.id
+  type              = "ingress"
+  protocol          = "-1"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = var.nat_allowed_cidrs
+  security_group_id = aws_security_group.nat_instance.id
   #source_security_group_id = local.nat_instance_ingress_sgs[count.index]
 }
 
